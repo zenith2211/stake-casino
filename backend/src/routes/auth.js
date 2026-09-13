@@ -137,15 +137,17 @@ router.get('/me', authenticate, (req, res) => {
 // ══════════════════════════════════════════════════════════════
 
 // Step 1: Redirect to Google
-// NOTE: No session:false here — session is needed for the OAuth state verification
+// Stateless (session: false) — the callback issues a JWT, so no server session is
+// needed. This keeps OAuth working across the Vercel → Render proxy split.
 router.get('/google',
-  passport.authenticate('google', { scope: ['profile', 'email'] })
+  passport.authenticate('google', { scope: ['profile', 'email'], session: false })
 );
 
 // Step 2: Google callback
-// NOTE: session:false removed — passport needs the session to complete the handshake
+// Stateless (session: false): passport sets req.user from the verify callback and we
+// redirect back to the frontend with a JWT in the query string.
 router.get('/google/callback',
-  passport.authenticate('google', { failureRedirect: '/?auth=error' }),
+  passport.authenticate('google', { failureRedirect: '/?auth=error', session: false }),
   (req, res) => {
     const data = req.user;
     if (data.isNew) {
