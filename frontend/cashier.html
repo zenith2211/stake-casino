@@ -1,0 +1,1703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cashier — Stake Casino</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+<style>
+/* ─── TOKENS ─────────────────────────────────────────────── */
+:root{
+  --bg0:#0b1520; --bg1:#0f1e2e; --bg2:#142233; --bg3:#1a2d40;
+  --bg4:#213549; --bg5:#2a4159;
+  --g:#22c55e; --g2:#16a34a; --g-glow:rgba(34,197,94,.18);
+  --r:#ef4444; --o:#f59e0b; --b:#3b82f6; --pu:#a855f7;
+  --t1:#ffffff; --t2:#94a3b8; --t3:#64748b; --t4:#3d5166;
+  --border:rgba(255,255,255,.07); --border2:rgba(255,255,255,.12);
+  --fd:'DM Sans',sans-serif; --fh:'Rajdhani',sans-serif;
+  --r8:8px; --r12:12px; --r16:16px; --r20:20px;
+  --shadow:0 24px 64px rgba(0,0,0,.55);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  font-family:var(--fd);background:var(--bg0);color:var(--t1);
+  min-height:100vh;display:flex;flex-direction:column;
+}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:var(--bg0);}
+::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px;}
+
+/* ─── TOPBAR ─────────────────────────────────────────────── */
+.topbar{
+  background:var(--bg1);border-bottom:1px solid var(--border);
+  height:60px;display:flex;align-items:center;padding:0 24px;gap:16px;
+  position:sticky;top:0;z-index:100;
+}
+.logo{font-family:var(--fh);font-size:28px;font-weight:700;color:var(--g);letter-spacing:3px;cursor:pointer;text-decoration:none;}
+.back-btn{
+  display:flex;align-items:center;gap:6px;color:var(--t3);font-size:13px;
+  padding:6px 14px;border:1px solid var(--border);border-radius:var(--r8);
+  cursor:pointer;transition:all .2s;text-decoration:none;
+}
+.back-btn:hover{border-color:var(--g);color:var(--g);}
+.tb-sp{flex:1;}
+.balance-chip{
+  display:flex;align-items:center;gap:8px;
+  background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r8);
+  padding:7px 14px;
+}
+.bal-label{font-size:11px;color:var(--t3);}
+.bal-val{font-family:var(--fh);font-size:18px;font-weight:700;color:var(--g);}
+
+/* ─── LAYOUT ─────────────────────────────────────────────── */
+.page{
+  flex:1;display:flex;align-items:flex-start;justify-content:center;
+  padding:40px 24px;gap:32px;flex-wrap:wrap;
+}
+
+/* ─── CASHIER CARD ───────────────────────────────────────── */
+.cashier{
+  width:520px;max-width:100%;
+  background:var(--bg1);border:1px solid var(--border);border-radius:var(--r20);
+  overflow:hidden;box-shadow:var(--shadow);
+}
+
+.cashier-header{
+  padding:24px 28px 20px;border-bottom:1px solid var(--border);
+  background:linear-gradient(135deg,var(--bg2),var(--bg1));
+}
+.ch-title{font-family:var(--fh);font-size:26px;font-weight:700;letter-spacing:.5px;}
+.ch-sub{color:var(--t3);font-size:13px;margin-top:4px;}
+
+/* mode tabs (Deposit / Withdraw) */
+.mode-tabs{display:flex;border-bottom:1px solid var(--border);}
+.mode-tab{
+  flex:1;padding:14px;text-align:center;cursor:pointer;
+  font-weight:600;font-size:14px;color:var(--t3);
+  border-bottom:2px solid transparent;transition:all .2s;
+}
+.mode-tab:hover{color:var(--t1);}
+.mode-tab.active{color:var(--g);border-bottom-color:var(--g);}
+
+/* method selector */
+.methods{display:flex;gap:8px;padding:20px 28px 0;}
+.method-btn{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;
+  padding:14px 8px;border-radius:var(--r12);cursor:pointer;
+  border:2px solid var(--border);background:var(--bg2);
+  transition:all .2s;
+}
+.method-btn:hover{border-color:var(--border2);background:var(--bg3);}
+.method-btn.active{border-color:var(--g);background:rgba(34,197,94,.07);}
+.method-icon{font-size:24px;}
+.method-name{font-size:11px;font-weight:600;color:var(--t2);}
+.method-sub{font-size:10px;color:var(--t3);}
+
+/* form area */
+.form-area{padding:24px 28px;}
+
+.form-group{margin-bottom:16px;}
+.form-label{
+  display:flex;align-items:center;justify-content:space-between;
+  font-size:11px;font-weight:600;color:var(--t3);
+  text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;
+}
+.form-label span{color:var(--t4);}
+.form-label .limit{color:var(--t4);font-size:10px;font-weight:400;text-transform:none;}
+
+.input-wrap{
+  display:flex;align-items:center;gap:8px;
+  background:var(--bg2);border:1px solid var(--border);border-radius:var(--r8);
+  padding:0 14px;transition:border-color .2s;
+}
+.input-wrap:focus-within{border-color:var(--g);}
+.input-icon{color:var(--t3);font-size:16px;user-select:none;}
+.input-wrap input, .input-wrap select{
+  flex:1;background:none;border:none;outline:none;
+  color:var(--t1);font-family:var(--fd);font-size:15px;font-weight:500;
+  padding:12px 0;
+}
+.input-wrap select option{background:var(--bg2);}
+.input-suffix{color:var(--t3);font-size:12px;}
+
+.quick-amounts{display:flex;gap:6px;margin-top:8px;}
+.qa-btn{
+  flex:1;padding:7px;text-align:center;border-radius:var(--r8);
+  border:1px solid var(--border);background:var(--bg3);
+  color:var(--t2);font-size:12px;font-weight:600;cursor:pointer;
+  transition:all .15s;font-family:var(--fd);
+}
+.qa-btn:hover{border-color:var(--g);color:var(--g);background:rgba(34,197,94,.06);}
+
+/* UPI specific */
+.upi-apps{display:flex;gap:8px;margin-bottom:16px;}
+.upi-app{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;
+  padding:12px 6px;border-radius:var(--r8);border:2px solid var(--border);
+  background:var(--bg2);cursor:pointer;transition:all .2s;
+}
+.upi-app:hover{border-color:var(--border2);}
+.upi-app.selected{border-color:var(--g);background:rgba(34,197,94,.06);}
+.upi-emoji{font-size:22px;}
+.upi-app-name{font-size:10px;color:var(--t2);font-weight:600;}
+
+/* crypto address box */
+.crypto-address-box{
+  background:var(--bg2);border:1px solid var(--border);border-radius:var(--r12);
+  padding:20px;margin-bottom:16px;
+}
+.cab-title{font-size:12px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.8px;margin-bottom:14px;}
+.qr-wrap{
+  display:flex;align-items:center;gap:20px;
+}
+.qr-img{
+  width:100px;height:100px;border-radius:var(--r8);
+  background:white;padding:4px;flex-shrink:0;
+}
+.qr-info{flex:1;}
+.qr-address{
+  font-size:12px;font-family:monospace;color:var(--t2);
+  word-break:break-all;margin-bottom:8px;line-height:1.5;
+}
+.copy-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--bg3);border:1px solid var(--border);border-radius:var(--r8);
+  padding:6px 12px;cursor:pointer;font-size:11px;color:var(--t2);
+  transition:all .2s;font-family:var(--fd);
+}
+.copy-btn:hover{border-color:var(--g);color:var(--g);}
+.copy-btn.copied{border-color:var(--g);color:var(--g);background:rgba(34,197,94,.08);}
+
+.crypto-amount-info{
+  display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px;
+}
+.cai-item{
+  background:var(--bg3);border-radius:var(--r8);padding:10px 12px;
+}
+.cai-label{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
+.cai-val{font-size:14px;font-weight:700;font-family:var(--fh);}
+.cai-val.green{color:var(--g);}
+.cai-val.orange{color:var(--o);}
+
+/* progress bar */
+.payment-progress{margin-top:14px;}
+.pp-header{display:flex;justify-content:space-between;font-size:11px;color:var(--t3);margin-bottom:8px;}
+.pp-track{height:6px;background:var(--bg4);border-radius:3px;overflow:hidden;}
+.pp-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--g),var(--g2));transition:width .5s;}
+.pp-steps{display:flex;justify-content:space-between;margin-top:8px;}
+.pp-step{font-size:10px;color:var(--t4);display:flex;align-items:center;gap:3px;}
+.pp-step.done{color:var(--g);}
+.pp-step.active{color:var(--o);}
+
+/* rates ticker */
+.rates-ticker{
+  display:flex;gap:16px;padding:12px 28px;
+  border-bottom:1px solid var(--border);overflow-x:auto;
+}
+.rate-item{display:flex;align-items:center;gap:6px;white-space:nowrap;}
+.rate-sym{font-size:14px;}
+.rate-name{font-size:11px;color:var(--t3);}
+.rate-price{font-size:12px;font-weight:700;color:var(--t2);}
+.rate-change{font-size:10px;padding:2px 5px;border-radius:4px;font-weight:600;}
+.rate-change.up{background:rgba(34,197,94,.15);color:var(--g);}
+.rate-change.dn{background:rgba(239,68,68,.15);color:var(--r);}
+
+/* submit button */
+.submit-btn{
+  width:100%;padding:15px;border-radius:var(--r12);border:none;cursor:pointer;
+  font-family:var(--fh);font-size:20px;font-weight:700;letter-spacing:1.5px;
+  transition:all .2s;margin-top:4px;
+}
+.submit-btn.deposit{background:linear-gradient(135deg,var(--g),var(--g2));color:#000;}
+.submit-btn.deposit:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(34,197,94,.35);}
+.submit-btn.withdraw{background:linear-gradient(135deg,var(--o),#d97706);color:#000;}
+.submit-btn.withdraw:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(245,158,11,.35);}
+.submit-btn:disabled{opacity:.5;cursor:not-allowed;transform:none!important;box-shadow:none!important;}
+
+.fee-info{
+  display:flex;justify-content:space-between;
+  font-size:12px;color:var(--t3);margin-top:10px;padding:0 2px;
+}
+.fee-info .free{color:var(--g);font-weight:600;}
+
+/* ─── RIGHT PANEL ─────────────────────────────────────────── */
+.right-panel{
+  width:300px;max-width:100%;
+  display:flex;flex-direction:column;gap:16px;
+}
+
+/* stats card */
+.rp-card{
+  background:var(--bg1);border:1px solid var(--border);border-radius:var(--r16);
+  padding:20px;
+}
+.rp-card-title{
+  font-family:var(--fh);font-size:16px;font-weight:700;
+  margin-bottom:14px;display:flex;align-items:center;gap:8px;
+}
+.rp-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:8px 0;border-bottom:1px solid var(--border);
+  font-size:13px;
+}
+.rp-row:last-child{border-bottom:none;}
+.rp-row .label{color:var(--t3);}
+.rp-row .val{font-weight:600;}
+.rp-row .val.green{color:var(--g);}
+.rp-row .val.red{color:var(--r);}
+.rp-row .val.orange{color:var(--o);}
+
+/* history */
+.hist-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 0;border-bottom:1px solid var(--border);
+}
+.hist-item:last-child{border-bottom:none;}
+.hist-icon{
+  width:34px;height:34px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;flex-shrink:0;
+}
+.hist-icon.deposit{background:rgba(34,197,94,.12);}
+.hist-icon.withdrawal{background:rgba(239,68,68,.12);}
+.hist-body{flex:1;}
+.hist-method{font-size:13px;font-weight:600;}
+.hist-date{font-size:11px;color:var(--t3);}
+.hist-amt{font-size:14px;font-weight:700;}
+.hist-amt.pos{color:var(--g);}
+.hist-amt.neg{color:var(--r);}
+.hist-status{
+  font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;
+  text-transform:uppercase;letter-spacing:.5px;
+}
+.hist-status.completed,.hist-status.approved{background:rgba(34,197,94,.15);color:var(--g);}
+.hist-status.pending{background:rgba(245,158,11,.15);color:var(--o);}
+.hist-status.processing{background:rgba(59,130,246,.15);color:var(--b);}
+.hist-status.rejected,.hist-status.failed{background:rgba(239,68,68,.15);color:var(--r);}
+
+/* ── stepped deposit flow ── */
+.dep-steps{display:flex;gap:6px;margin-bottom:18px;}
+.dep-steps .ds{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;
+  font-size:10px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.5px;text-align:center;
+}
+.dep-steps .ds .ds-dot{
+  width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  background:var(--bg3);border:2px solid var(--border);color:var(--t4);font-size:12px;transition:all .25s;
+}
+.dep-steps .ds.active{color:var(--g);}
+.dep-steps .ds.active .ds-dot{border-color:var(--g);background:rgba(34,197,94,.12);color:var(--g);}
+.dep-steps .ds.done{color:var(--g);}
+.dep-steps .ds.done .ds-dot{border-color:var(--g);background:var(--g);color:#04140a;}
+
+.upi-highlight{
+  background:linear-gradient(135deg,rgba(34,197,94,.10),rgba(34,197,94,.03));
+  border:2px solid var(--g);border-radius:var(--r12);padding:16px;margin-bottom:16px;
+  box-shadow:0 0 0 4px var(--g-glow);
+}
+.upi-highlight .uh-label{font-size:11px;font-weight:700;color:var(--g);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.upi-highlight .uh-id{
+  font-family:var(--fh);font-size:22px;font-weight:700;color:var(--t1);
+  word-break:break-all;line-height:1.25;letter-spacing:.5px;
+}
+.upi-highlight .uh-meta{font-size:11px;color:var(--t3);margin-top:6px;}
+.upi-highlight .copy-btn{margin-top:12px;}
+
+.step-back{
+  background:none;border:none;color:var(--t3);font-size:12px;font-weight:600;cursor:pointer;
+  padding:0;margin-bottom:12px;display:inline-flex;align-items:center;gap:4px;
+}
+.step-back:hover{color:var(--g);}
+
+.amt-confirm{
+  display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;
+  background:var(--bg2);border:1px solid var(--border);border-radius:var(--r8);
+  padding:12px 14px;margin-bottom:16px;font-size:13px;color:var(--t2);
+}
+.amt-confirm > span{min-width:0;word-break:break-all;}
+.amt-confirm b{color:var(--t1);font-family:var(--fh);font-size:18px;white-space:nowrap;}
+
+/* ── payment history section (full panel) ── */
+.ph-section{
+  width:100%;flex-basis:100%;background:var(--bg1);border:1px solid var(--border);
+  border-radius:var(--r20);padding:22px 24px;margin-top:4px;box-shadow:var(--shadow);box-sizing:border-box;
+}
+.ph-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
+.ph-title{font-family:var(--fh);font-size:20px;font-weight:700;color:var(--t1);display:flex;align-items:center;gap:8px;}
+.ph-refresh{
+  padding:6px 14px;border:1px solid var(--border);border-radius:var(--r8);
+  background:var(--bg3);color:var(--t2);font-size:12px;font-weight:600;cursor:pointer;
+}
+.ph-refresh:hover{border-color:var(--g);color:var(--g);}
+.ph-table{width:100%;border-collapse:collapse;font-size:13px;}
+.ph-table th{
+  text-align:left;padding:10px 12px;font-size:10px;font-weight:700;color:var(--t4);
+  text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);
+}
+.ph-table td{padding:12px;border-bottom:1px solid var(--border);color:var(--t2);vertical-align:middle;}
+.ph-table tr:last-child td{border-bottom:none;}
+.ph-table .ph-amt{font-weight:700;color:var(--t1);font-family:var(--fh);}
+.ph-method-pill{display:inline-flex;align-items:center;gap:5px;font-weight:600;color:var(--t2);}
+.ph-ref{font-family:monospace;font-size:11px;color:var(--t3);}
+.ph-badge{
+  display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;
+  padding:4px 10px;border-radius:20px;text-transform:capitalize;
+}
+.ph-badge.approved,.ph-badge.completed{background:rgba(34,197,94,.13);color:var(--g);}
+.ph-badge.pending{background:rgba(245,158,11,.13);color:var(--o);}
+.ph-badge.rejected,.ph-badge.failed{background:rgba(239,68,68,.13);color:var(--r);}
+.ph-empty{text-align:center;color:var(--t3);font-size:13px;padding:30px;}
+.ph-wrap{overflow-x:auto;}
+@media(max-width:640px){
+  body{overflow-x:hidden;}
+  .topbar{
+    height:auto;
+    min-height:56px;
+    padding:8px 10px;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+  .logo{font-size:22px;letter-spacing:2px;}
+  .back-btn{
+    order:3;
+    width:100%;
+    justify-content:center;
+    min-height:40px;
+    font-size:12px;
+  }
+  .tb-sp{display:none;}
+  .balance-chip{
+    margin-left:auto;
+    padding:6px 10px;
+    max-width:48vw;
+    min-height:40px;
+  }
+  .bal-label{display:none;}
+  .bal-val{
+    font-size:16px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .rates-ticker{padding:10px 12px;}
+  .cashier{border-radius:var(--r12);}
+  .cashier-header{padding:18px 16px 14px;}
+  .ch-title{font-size:23px;}
+  .methods{
+    overflow-x:auto;
+    padding:14px 14px 0;
+    gap:8px;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+  .methods::-webkit-scrollbar{display:none;}
+  .method-btn{
+    flex:0 0 86px;
+    min-height:82px;
+    padding:10px 8px;
+  }
+  .form-area{padding:18px 14px;}
+  .quick-amounts{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
+  .qa-btn{padding:10px 6px;font-size:13px;min-height:42px;}
+  .input-wrap{padding:0 12px;min-height:52px;}
+  .input-wrap input,.input-wrap select{font-size:16px;padding:14px 0;}
+  .form-label{font-size:12px;margin-bottom:10px;}
+  .form-group{margin-bottom:20px;}
+  .submit-btn{min-height:52px;font-size:15px;border-radius:12px;}
+  .fee-info{flex-direction:column;gap:5px;}
+  .upi-apps{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
+  .upi-app{padding:10px 4px;}
+  .toast{left:12px;right:12px;bottom:14px;min-width:0;}
+  .status-box{padding:26px 18px;}
+  .sb-title{font-size:24px;}
+  .sb-icon{font-size:48px;}
+  .ph-table .ph-hide-sm{display:none;}
+  .ph-section{padding:18px 14px;}
+  .ph-table th,.ph-table td{padding:10px 8px;font-size:12px;}
+  .upi-highlight .uh-id{font-size:18px;}
+  .dep-steps .ds{font-size:9px;}
+  .page{padding:20px 12px;gap:20px;}
+}
+
+@media(max-width:380px){
+  .method-btn{flex-basis:78px;}
+  .method-icon{font-size:20px;}
+  .method-name{font-size:10px;}
+  .method-sub{font-size:9px;}
+  .submit-btn{font-size:17px;letter-spacing:.8px;}
+}
+
+/* instructions */
+.instruction-list{list-style:none;display:flex;flex-direction:column;gap:8px;}
+.instruction-list li{
+  display:flex;align-items:flex-start;gap:10px;font-size:12px;color:var(--t2);
+}
+.il-num{
+  width:20px;height:20px;border-radius:50%;background:var(--bg4);
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:700;flex-shrink:0;color:var(--g);
+  margin-top:1px;
+}
+
+/* ─── TOAST ──────────────────────────────────────────────── */
+.toast{
+  position:fixed;bottom:28px;right:28px;z-index:999;
+  background:var(--bg2);border:1px solid var(--border);border-radius:var(--r12);
+  padding:14px 18px;min-width:300px;
+  box-shadow:0 16px 40px rgba(0,0,0,.5);
+  display:none;animation:toastSlide .3s ease;
+}
+.toast.show{display:flex;gap:12px;align-items:center;}
+.toast.ok{border-color:rgba(34,197,94,.4);}
+.toast.err{border-color:rgba(239,68,68,.4);}
+.toast.info{border-color:rgba(59,130,246,.4);}
+@keyframes toastSlide{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:none}}
+.t-icon{font-size:22px;}
+.t-body .t-title{font-weight:700;font-size:14px;}
+.t-body .t-sub{font-size:12px;color:var(--t3);margin-top:2px;}
+
+/* ─── STATUS OVERLAY ─────────────────────────────────────── */
+.status-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.75);
+  display:none;align-items:center;justify-content:center;z-index:500;
+}
+.status-overlay.show{display:flex;}
+.status-box{
+  background:var(--bg1);border:1px solid var(--border);border-radius:var(--r20);
+  padding:40px;text-align:center;max-width:400px;width:90%;
+  animation:popIn .3s ease;box-shadow:var(--shadow);
+}
+@keyframes popIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:none}}
+.sb-icon{font-size:64px;margin-bottom:16px;}
+.sb-title{font-family:var(--fh);font-size:28px;font-weight:700;margin-bottom:8px;}
+.sb-sub{color:var(--t3);font-size:14px;margin-bottom:24px;}
+.sb-btn{
+  background:var(--g);color:#000;border:none;
+  padding:12px 32px;border-radius:var(--r8);
+  font-family:var(--fh);font-size:18px;font-weight:700;
+  cursor:pointer;transition:all .2s;
+}
+.sb-btn:hover{background:var(--g2);}
+
+/* ── PREMIUM ADMIN ENHANCEMENTS ── */
+body {
+  background-image:
+    radial-gradient(ellipse 60% 40% at 20% 0%, rgba(34,197,94,0.04), transparent),
+    radial-gradient(ellipse 50% 50% at 80% 100%, rgba(59,130,246,0.03), transparent) !important;
+}
+.card, .panel, .stat-card {
+  border-radius: 14px !important;
+  border: 1px solid rgba(148,163,184,0.06) !important;
+  backdrop-filter: blur(8px) !important;
+}
+button, .btn {
+  border-radius: 10px !important;
+  transition: all 0.2s ease !important;
+}
+input, select, textarea {
+  border-radius: 10px !important;
+  transition: border-color 0.2s ease !important;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: #22c55e !important;
+  box-shadow: 0 0 0 3px rgba(34,197,94,0.08) !important;
+  outline: none !important;
+}
+
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <a class="logo" href="/">STAKE</a>
+  <a class="back-btn" href="/">← Back to Casino</a>
+  <div class="tb-sp"></div>
+  <div class="balance-chip">
+    <span class="bal-label">Balance</span>
+    <span class="bal-val" id="bal-display">$—</span>
+  </div>
+</div>
+
+<!-- LIVE RATES TICKER -->
+<div class="rates-ticker" id="rates-ticker">
+  <div class="rate-item"><span class="rate-sym">₿</span><span class="rate-name">BTC</span><span class="rate-price" id="r-btc">$—</span></div>
+  <div class="rate-item"><span class="rate-sym">Ξ</span><span class="rate-name">ETH</span><span class="rate-price" id="r-eth">$—</span></div>
+  <div class="rate-item"><span class="rate-sym">₮</span><span class="rate-name">USDT</span><span class="rate-price" id="r-usdt">$—</span></div>
+  <div class="rate-item"><span class="rate-sym">Ł</span><span class="rate-name">LTC</span><span class="rate-price" id="r-ltc">$—</span></div>
+  <div class="rate-item"><span class="rate-sym">Ð</span><span class="rate-name">DOGE</span><span class="rate-price" id="r-doge">$—</span></div>
+  <div class="rate-item"><span class="rate-sym">⬡</span><span class="rate-name">BNB</span><span class="rate-price" id="r-bnb">$—</span></div>
+</div>
+
+<!-- PAGE -->
+<div class="page">
+
+  <!-- ── CASHIER MAIN CARD ── -->
+  <div class="cashier">
+
+    <div class="cashier-header">
+      <div class="ch-title">💰 Cashier</div>
+      <div class="ch-sub">Deposit or withdraw funds instantly</div>
+    </div>
+
+    <!-- Deposit / Withdraw tabs -->
+    <div class="mode-tabs">
+      <div class="mode-tab active" id="tab-deposit" onclick="setMode('deposit')">Deposit</div>
+      <div class="mode-tab" id="tab-withdraw" onclick="setMode('withdraw')">Withdraw</div>
+    </div>
+
+    <!-- Payment method selector -->
+    <div class="methods">
+      <div class="method-btn active" id="method-upi" onclick="setMethod('upi')">
+        <span class="method-icon">🏦</span>
+        <span class="method-name">UPI</span>
+        <span class="method-sub">Instant</span>
+      </div>
+      <div class="method-btn" id="method-btc" onclick="setMethod('btc')">
+        <span class="method-icon">₿</span>
+        <span class="method-name">Bitcoin</span>
+        <span class="method-sub">Crypto</span>
+      </div>
+      <div class="method-btn" id="method-eth" onclick="setMethod('eth')">
+        <span class="method-icon">Ξ</span>
+        <span class="method-name">ETH</span>
+        <span class="method-sub">Crypto</span>
+      </div>
+      <div class="method-btn" id="method-usdt" onclick="setMethod('usdt')">
+        <span class="method-icon">₮</span>
+        <span class="method-name">USDT</span>
+        <span class="method-sub">Stable</span>
+      </div>
+      <div class="method-btn" id="method-bnb" onclick="setMethod('bnb')">
+        <span class="method-icon">⬡</span>
+        <span class="method-name">BNB</span>
+        <span class="method-sub">Crypto</span>
+      </div>
+    </div>
+
+    <!-- Dynamic form area -->
+    <div class="form-area" id="form-area"></div>
+  </div>
+
+  <!-- ── RIGHT PANEL ── -->
+  <div class="right-panel">
+
+    <!-- Balance card -->
+    <div class="rp-card">
+      <div class="rp-card-title">📊 Account</div>
+      <div class="rp-row"><span class="label">Balance</span><span class="val green" id="rp-balance">$—</span></div>
+      <div class="rp-row"><span class="label">Total Deposited</span><span class="val" id="rp-deposited">₹0</span></div>
+      <div class="rp-row"><span class="label">Total Withdrawn</span><span class="val" id="rp-withdrawn">₹0</span></div>
+      <div class="rp-row"><span class="label">Status</span><span class="val green">✅ Active</span></div>
+    </div>
+
+    <!-- Instructions -->
+    <div class="rp-card">
+      <div class="rp-card-title" id="instr-title">📋 How to Deposit</div>
+      <ul class="instruction-list" id="instr-list"></ul>
+    </div>
+
+    <!-- Transaction history -->
+    <div class="rp-card">
+      <div class="rp-card-title">🕑 Recent Transactions</div>
+      <div id="history-list"><div style="color:var(--t3);font-size:12px;text-align:center;padding:16px">Loading...</div></div>
+    </div>
+
+  </div>
+
+  <!-- ── FULL PAYMENT HISTORY ── -->
+  <div class="ph-section">
+    <div class="ph-head">
+      <div class="ph-title">📜 Payment History</div>
+      <button class="ph-refresh" onclick="loadHistory()">↻ Refresh</button>
+    </div>
+    <div class="ph-wrap">
+      <table class="ph-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Method</th>
+            <th>Amount</th>
+            <th class="ph-hide-sm">Reference</th>
+            <th class="ph-hide-sm">Your UTR / Tx</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="ph-tbody">
+          <tr><td colspan="6" class="ph-empty">Loading payment history…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- STATUS OVERLAY -->
+<div class="status-overlay" id="status-overlay">
+  <div class="status-box">
+    <div class="sb-icon" id="sb-icon">⏳</div>
+    <div class="sb-title" id="sb-title">Processing</div>
+    <div class="sb-sub" id="sb-sub">Please wait...</div>
+    <button class="sb-btn" onclick="closeStatus()">Close</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <div class="t-icon" id="t-icon">💰</div>
+  <div class="t-body">
+    <div class="t-title" id="t-title">Success</div>
+    <div class="t-sub" id="t-sub"></div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+const API   = '/api';
+const token = localStorage.getItem('token');
+
+let state = {
+  mode:       'deposit',
+  method:     'upi',
+  balance:    0,
+  user:       null,
+  config:     {},
+  rates:      {},
+  cryptoPayment: null,
+  pollInterval:  null,
+};
+
+// ── INIT ─────────────────────────────────────────────────────
+async function init() {
+  // If redirected here from a locked game, show why.
+  try {
+    const gm = sessionStorage.getItem('gateMsg');
+    if (gm) {
+      sessionStorage.removeItem('gateMsg');
+      if (typeof toast === 'function') toast('ok','🔒','Deposit to play', gm);
+    }
+  } catch(e){}
+  await Promise.all([loadUser(), loadRates(), loadConfig(), loadHistory()]);
+  if ((window.location.hash || '').toLowerCase() === '#withdraw') {
+    setMode('withdraw');
+    return;
+  }
+  renderForm();
+  renderInstructions();
+  setInterval(loadRates, 30000);
+}
+
+async function loadUser() {
+  try {
+    const r = await apiFetch('/auth/me');
+    state.user    = r.user;
+    state.balance = r.user.balance;
+    updateBalanceUI();
+  } catch(e) {
+    // not logged in — redirect
+    window.location.href = '/';
+  }
+}
+
+async function loadRates() {
+  try {
+    const r = await apiFetch('/payment/rates');
+    state.rates = r;
+    updateRatesTicker(r);
+  } catch(e) {}
+}
+
+async function loadConfig() {
+  try {
+    state.config = await apiFetch('/payment/config');
+  } catch(e) {
+    state.config = { razorpayKeyId: null, minDeposit: 100, maxDeposit: 500000 };
+  }
+}
+
+async function loadHistory() {
+  try {
+    const r = await apiFetch('/payment/history');
+    renderHistory(r.transactions || []);
+    // calculate totals
+    const deps = r.transactions.filter(t => t.type === 'deposit' && t.status === 'completed');
+    const wds  = r.transactions.filter(t => t.type === 'withdrawal');
+    document.getElementById('rp-deposited').textContent = '₹' + deps.reduce((s,t) => s + Math.abs(t.amount), 0).toFixed(2);
+    document.getElementById('rp-withdrawn').textContent = '₹' + wds.reduce((s,t) => s + Math.abs(t.amount), 0).toFixed(2);
+  } catch(e) {}
+}
+
+function updateBalanceUI() {
+  const v = '₹' + (state.balance || 0).toFixed(2);
+  document.getElementById('bal-display').textContent = v;
+  document.getElementById('rp-balance').textContent  = v;
+}
+
+function updateRatesTicker(rates) {
+  if (rates.BTC?.usd)  document.getElementById('r-btc').textContent  = '₹' + rates.BTC.usd.toLocaleString();
+  if (rates.ETH?.usd)  document.getElementById('r-eth').textContent  = '₹' + rates.ETH.usd.toLocaleString();
+  if (rates.USDT?.usd) document.getElementById('r-usdt').textContent = '₹' + rates.USDT.usd.toLocaleString();
+  if (rates.LTC?.usd)  document.getElementById('r-ltc').textContent  = '₹' + rates.LTC.usd.toLocaleString();
+  if (rates.DOGE?.usd) document.getElementById('r-doge').textContent = '₹' + rates.DOGE.usd.toFixed(4);
+  if (rates.BNB?.usd)  document.getElementById('r-bnb').textContent  = '₹' + rates.BNB.usd.toLocaleString();
+}
+
+// ── MODE / METHOD SWITCHING ───────────────────────────────────
+function setMode(mode) {
+  state.mode = mode;
+  document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + mode).classList.add('active');
+  clearPollInterval();
+  renderForm();
+  renderInstructions();
+}
+
+function setMethod(method) {
+  state.method = method;
+  document.querySelectorAll('.method-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('method-' + method).classList.add('active');
+  clearPollInterval();
+  renderForm();
+  renderInstructions();
+}
+
+// ── FORM RENDERING ────────────────────────────────────────────
+function renderForm() {
+  const area = document.getElementById('form-area');
+  const isCrypto = ['btc','eth','usdt','ltc','doge','bnb'].includes(state.method);
+  const isUPI    = state.method === 'upi';
+  const isCard   = state.method === 'card';
+
+  if (state.mode === 'deposit') {
+    renderDepositForm();
+  } else {
+    if (isUPI)   renderUPIWithdrawForm(area);
+    else if (isCard) renderCardWithdrawForm(area);
+    else renderCryptoWithdrawForm(area, state.method);
+  }
+}
+
+// ─── RAZORPAY DEPOSIT (UPI + Card) ───────────────────────────
+function renderRazorpayDepositForm(area, isUPI) {
+  area.innerHTML = `
+    ${isUPI ? `
+    <div class="form-group">
+      <div class="form-label">Select UPI App</div>
+      <div class="upi-apps">
+        <div class="upi-app selected" id="upi-gpay" onclick="selectUPIApp('gpay',this)">
+          <span class="upi-emoji">📱</span><span class="upi-app-name">GPay</span>
+        </div>
+        <div class="upi-app" id="upi-phonepe" onclick="selectUPIApp('phonepe',this)">
+          <span class="upi-emoji">💜</span><span class="upi-app-name">PhonePe</span>
+        </div>
+        <div class="upi-app" id="upi-paytm" onclick="selectUPIApp('paytm',this)">
+          <span class="upi-emoji">🔵</span><span class="upi-app-name">Paytm</span>
+        </div>
+        <div class="upi-app" id="upi-bhim" onclick="selectUPIApp('bhim',this)">
+          <span class="upi-emoji">🇮🇳</span><span class="upi-app-name">BHIM</span>
+        </div>
+      </div>
+    </div>` : ''}
+
+    <div class="form-group">
+      <div class="form-label">Amount (INR) <span class="limit">Min ₹${state.config.minDeposit||100} · Max ₹${state.config.maxDeposit||500000}</span></div>
+      <div class="input-wrap">
+        <span class="input-icon">₹</span>
+        <input type="number" id="deposit-amount" placeholder="Enter amount" min="${state.config.minDeposit||100}" step="100">
+      </div>
+      <div class="quick-amounts">
+        ${[500,1000,2000,5000,10000].map(v => `<button class="qa-btn" onclick="setAmount(${v})">₹${v.toLocaleString()}</button>`).join('')}
+      </div>
+    </div>
+
+    <div class="form-group" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r8);padding:12px 14px">
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--t3)">
+        <span>Processing Fee</span><span style="color:var(--g);font-weight:600">FREE</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--t3);margin-top:6px">
+        <span>Credited in INR</span><span id="usd-preview" style="color:var(--t2)">~₹0.00</span>
+      </div>
+    </div>
+
+    <button class="submit-btn deposit" onclick="initiateRazorpay()" id="dep-btn">
+      ${isUPI ? '⚡ PAY VIA UPI' : '💳 PAY VIA CARD'}
+    </button>
+    <div class="fee-info"><span>Instant credit · No KYC required</span><span style="color:var(--b)">🔒 256-bit SSL</span></div>`;
+
+  document.getElementById('deposit-amount').addEventListener('input', updateUSDPreview);
+}
+
+function selectUPIApp(app, el) {
+  document.querySelectorAll('.upi-app').forEach(a => a.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function setAmount(val) {
+  const inp = document.getElementById('deposit-amount');
+  if (inp) { inp.value = val; updateUSDPreview(); }
+}
+
+function updateUSDPreview() {
+  const inr = parseFloat(document.getElementById('deposit-amount')?.value || 0);
+  const usd = (inr * 0.012).toFixed(2);
+  const el  = document.getElementById('usd-preview');
+  if (el) el.textContent = `~₹${usd}`;
+}
+
+async function initiateRazorpay() {
+  const amount = parseFloat(document.getElementById('deposit-amount')?.value || 0);
+  if (!amount || amount < (state.config.minDeposit || 100)) {
+    return toast('err', '❌', 'Invalid amount', `Minimum deposit is ₹${state.config.minDeposit || 100}`);
+  }
+
+  if (!state.config.razorpayKeyId) {
+    return createManagedDeposit(state.method === 'upi' ? 'upi' : 'card', amount, 'INR');
+  }
+
+  const btn = document.getElementById('dep-btn');
+  btn.disabled = true; btn.textContent = 'LOADING...';
+
+  try {
+    const order = await apiFetch('/payment/razorpay/order', 'POST', { amount, currency: 'INR' });
+
+    const options = {
+      key:         order.keyId,
+      amount:      order.amount,
+      currency:    order.currency,
+      name:        order.name,
+      description: order.description,
+      order_id:    order.orderId,
+      prefill:     order.prefill,
+      theme:       { color: '#22c55e' },
+      modal: { ondismiss: () => { btn.disabled = false; btn.textContent = state.method === 'upi' ? '⚡ PAY VIA UPI' : '💳 PAY VIA CARD'; } },
+      handler: async (response) => {
+        btn.textContent = 'VERIFYING...';
+        try {
+          const verify = await apiFetch('/payment/razorpay/verify', 'POST', response);
+          state.balance = verify.balance;
+          updateBalanceUI();
+          await loadHistory();
+          showStatus('✅', 'Deposit Successful!', `₹${amount} deposited. +₹${verify.credited} credited to your balance.`);
+          toast('ok', '✅', 'Deposit Successful!', `+₹${verify.credited} added to your balance`);
+        } catch(e) {
+          toast('err', '❌', 'Verification Failed', e.message);
+        }
+        btn.disabled = false;
+        btn.textContent = state.method === 'upi' ? '⚡ PAY VIA UPI' : '💳 PAY VIA CARD';
+      },
+    };
+
+    // Set payment method preference
+    if (state.method === 'upi') options.method = { upi: true };
+    else if (state.method === 'card') options.method = { card: true };
+
+    const rzp = new Razorpay(options);
+    rzp.open();
+    btn.disabled = false;
+    btn.textContent = state.method === 'upi' ? '⚡ PAY VIA UPI' : '💳 PAY VIA CARD';
+  } catch(e) {
+    toast('err', '❌', 'Error', e.message);
+    btn.disabled = false;
+    btn.textContent = '⚡ PAY';
+  }
+}
+
+async function createManagedDeposit(method, amount, currency) {
+  const btn = document.getElementById('dep-btn');
+  btn.disabled = true; btn.textContent = 'CREATING REQUEST...';
+  try {
+    const r = await apiFetch('/payment/deposits', 'POST', {
+      method,
+      amount,
+      currency,
+      businessUnit: 'default',
+      brand: 'default',
+      region: currency === 'INR' ? 'IN' : 'global',
+    });
+    const d = r.deposit;
+    await loadHistory();
+    if (d.instructions?.upiId) {
+      showStatus('🏦', 'UPI Deposit Request Created', `Send ${currency} ${amount} to ${d.instructions.upiId}. Reference: ${d.reference}. Admin review will complete the deposit.`);
+      toast('ok', '✅', 'Deposit Pending', `Send payment to ${d.instructions.upiId}`);
+    } else {
+      showStatus('⏳', 'Deposit Request Created', `Reference: ${d.reference}. The configured compliant processor or admin review will update the status.`);
+      toast('ok', '✅', 'Deposit Pending', 'Request saved for processing');
+    }
+  } catch(e) {
+    toast('err', '❌', 'Deposit Request Failed', e.message);
+  }
+  btn.disabled = false;
+  btn.textContent = method === 'upi' ? '⚡ PAY VIA UPI' : '💳 PAY VIA CARD';
+}
+
+// ─── CRYPTO DEPOSIT ──────────────────────────────────────────
+const CRYPTO_META = {
+  btc:  { sym:'₿', name:'Bitcoin',  color:'#f7931a', icon:'🟠', network:'Bitcoin Network',    min:10  },
+  eth:  { sym:'Ξ', name:'Ethereum', color:'#627eea', icon:'💠', network:'Ethereum (ERC-20)',   min:10  },
+  usdt: { sym:'₮', name:'Tether',   color:'#26a17b', icon:'💚', network:'Tron TRC-20',         min:5   },
+  ltc:  { sym:'Ł', name:'Litecoin', color:'#bfbbbb', icon:'⚡', network:'Litecoin Network',    min:5   },
+  doge: { sym:'Ð', name:'Dogecoin', color:'#c2a633', icon:'🐕', network:'Dogecoin Network',    min:5   },
+  bnb:  { sym:'⬡', name:'BNB',      color:'#f3ba2f', icon:'🟡', network:'BNB Smart Chain',     min:10  },
+};
+
+function renderCryptoDepositForm(area, currency) {
+  const meta = CRYPTO_META[currency] || CRYPTO_META.btc;
+  const rate = state.rates[currency.toUpperCase()]?.usd || 0;
+
+  area.innerHTML = `
+    <div class="form-group">
+      <div class="form-label">
+        Amount (INR)
+        <span class="limit">Min ₹${meta.min}</span>
+      </div>
+      <div class="input-wrap">
+        <span class="input-icon">$</span>
+        <input type="number" id="deposit-amount" placeholder="Enter INR amount" min="${meta.min}" step="1">
+        <span class="input-suffix">USD</span>
+      </div>
+      <div class="quick-amounts">
+        ${[25,50,100,250,500].map(v => `<button class="qa-btn" onclick="setAmount(${v})">₹${v}</button>`).join('')}
+      </div>
+      ${rate ? `<div style="font-size:11px;color:var(--t3);margin-top:8px">1 ${meta.name} = ₹${rate.toLocaleString()} USD</div>` : ''}
+    </div>
+
+    <div id="crypto-address-area"></div>
+
+    <button class="submit-btn deposit" onclick="initiateCryptoPayment('${currency}')" id="dep-btn">
+      ${meta.icon} GENERATE ${meta.name.toUpperCase()} ADDRESS
+    </button>
+    <div class="fee-info">
+      <span>Network: ${meta.network}</span>
+      <span style="color:var(--b)">Auto-detected on-chain</span>
+    </div>`;
+}
+
+async function initiateCryptoPayment(currency) {
+  const amount = parseFloat(document.getElementById('deposit-amount')?.value || 0);
+  const meta   = CRYPTO_META[currency] || {};
+  if (!amount || amount < (meta.min || 5)) {
+    return toast('err', '❌', 'Invalid amount', `Minimum is ₹${meta.min || 5}`);
+  }
+
+  const btn = document.getElementById('dep-btn');
+  btn.disabled = true; btn.textContent = 'GENERATING ADDRESS...';
+
+  try {
+    const data = await apiFetch('/payment/crypto/create', 'POST', { amount, currency });
+    state.cryptoPayment = data;
+
+    const area = document.getElementById('crypto-address-area');
+    area.innerHTML = `
+      <div class="crypto-address-box">
+        <div class="cab-title">📡 Send ${data.payCurrency} to this address</div>
+        <div class="qr-wrap">
+          <img class="qr-img" src="${data.qrCode}" alt="QR" onerror="this.style.display='none'">
+          <div class="qr-info">
+            <div class="qr-address">${data.payAddress}</div>
+            <button class="copy-btn" id="copy-btn" onclick="copyAddress('${data.payAddress}')">📋 Copy Address</button>
+          </div>
+        </div>
+        <div class="crypto-amount-info">
+          <div class="cai-item">
+            <div class="cai-label">Send Exactly</div>
+            <div class="cai-val green">${data.payAmount} ${data.payCurrency}</div>
+          </div>
+          <div class="cai-item">
+            <div class="cai-label">USD Value</div>
+            <div class="cai-val orange">₹${data.usdAmount}</div>
+          </div>
+          <div class="cai-item">
+            <div class="cai-label">Payment ID</div>
+            <div class="cai-val" style="font-size:11px">${data.paymentId}</div>
+          </div>
+          <div class="cai-item">
+            <div class="cai-label">Network</div>
+            <div class="cai-val" style="font-size:11px">${data.network}</div>
+          </div>
+        </div>
+        <div class="payment-progress" id="pay-progress">
+          <div class="pp-header">
+            <span id="pp-status-text">⏳ Waiting for payment...</span>
+            <span id="pp-check-count">Checking...</span>
+          </div>
+          <div class="pp-track"><div class="pp-fill" id="pp-fill" style="width:10%"></div></div>
+          <div class="pp-steps">
+            <div class="pp-step active" id="step-waiting">⏳ Waiting</div>
+            <div class="pp-step" id="step-detecting">🔍 Detecting</div>
+            <div class="pp-step" id="step-confirming">⛓ Confirming</div>
+            <div class="pp-step" id="step-done">✅ Credited</div>
+          </div>
+        </div>
+      </div>`;
+
+    // Start polling
+    startCryptoPoll(data.paymentId);
+
+    toast('info', '📡', 'Address Generated', 'Send the exact amount shown. Auto-credited on confirmation.');
+  } catch(e) {
+    if (String(e.message || '').includes('NOWPAYMENTS_API_KEY')) {
+      await createManagedDeposit('crypto', amount, currency.toUpperCase());
+    } else {
+      toast('err', '❌', 'Error', e.message);
+    }
+  }
+
+  btn.disabled = false;
+  btn.textContent = '🔄 Regenerate Address';
+}
+
+let pollCount = 0;
+function startCryptoPoll(paymentId) {
+  clearPollInterval();
+  pollCount = 0;
+
+  state.pollInterval = setInterval(async () => {
+    pollCount++;
+    const el = document.getElementById('pp-check-count');
+    if (el) el.textContent = `Check #${pollCount}`;
+
+    try {
+      const data = await apiFetch(`/payment/crypto/status/${paymentId}`);
+      updateCryptoProgress(data.status, data);
+
+      if (['finished','confirmed'].includes(data.status)) {
+        clearPollInterval();
+        state.balance = data.balance;
+        updateBalanceUI();
+        await loadHistory();
+        showStatus('🎉', 'Payment Confirmed!', `₹${state.cryptoPayment?.usdAmount} has been credited to your account.`);
+      }
+    } catch(e) {}
+  }, 8000); // check every 8 seconds
+}
+
+function updateCryptoProgress(status, data) {
+  const fill     = document.getElementById('pp-fill');
+  const statusTx = document.getElementById('pp-status-text');
+  const steps    = { waiting: document.getElementById('step-waiting'), detecting: document.getElementById('step-detecting'),
+                     confirming: document.getElementById('step-confirming'), done: document.getElementById('step-done') };
+  if (!fill) return;
+
+  const map = {
+    waiting:    { pct:'15%',  txt:'⏳ Waiting for payment...', active:'waiting'    },
+    detecting:  { pct:'35%',  txt:'🔍 Payment detected!',     active:'detecting'   },
+    confirming: { pct:'65%',  txt:'⛓ Confirming on chain...', active:'confirming'  },
+    confirmed:  { pct:'90%',  txt:'✅ Confirming...',          active:'confirming'  },
+    finished:   { pct:'100%', txt:'🎉 Payment complete!',      active:'done'        },
+    failed:     { pct:'0%',   txt:'❌ Payment failed',         active:'waiting'     },
+    expired:    { pct:'0%',   txt:'⏰ Payment expired',        active:'waiting'     },
+  };
+  const cfg = map[status] || map.waiting;
+  fill.style.width = cfg.pct;
+  if (statusTx) statusTx.textContent = cfg.txt;
+
+  Object.entries(steps).forEach(([key, el]) => {
+    if (!el) return;
+    el.classList.remove('done','active');
+    const order = ['waiting','detecting','confirming','done'];
+    const activeIdx = order.indexOf(cfg.active);
+    const thisIdx   = order.indexOf(key);
+    if (thisIdx < activeIdx) el.classList.add('done');
+    if (thisIdx === activeIdx) el.classList.add('active');
+  });
+}
+
+// ─── UPI WITHDRAW ────────────────────────────────────────────
+function renderUPIWithdrawForm(area) {
+  area.innerHTML = `
+    <div class="form-group">
+      <div class="form-label">UPI ID <span class="limit">Required</span></div>
+      <div class="input-wrap" style="min-height:52px;">
+        <span class="input-icon" style="font-size:15px;flex-shrink:0;">@</span>
+        <input type="text" id="upi-id" placeholder="e.g. name@okicici" autocomplete="off"
+          style="font-size:15px;padding:14px 0;width:100%;min-width:0;"
+          inputmode="email">
+      </div>
+      <div style="font-size:11px;color:var(--t3);margin-top:6px">
+        📱 Examples: 9876543210@ybl &nbsp;·&nbsp; john@okicici &nbsp;·&nbsp; name@paytm
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="form-label">Amount (INR) <span class="limit">Min ₹200</span></div>
+      <div class="input-wrap" style="min-height:52px;">
+        <span class="input-icon" style="flex-shrink:0;">₹</span>
+        <input type="number" id="withdraw-amount" placeholder="Enter amount" min="200"
+          style="font-size:15px;padding:14px 0;width:100%;min-width:0;"
+          inputmode="numeric">
+      </div>
+      <div class="quick-amounts" style="margin-top:10px;">
+        ${[500,1000,2000,5000].map(v=>`<button class="qa-btn" onclick="setWAmount(${v})">₹${v.toLocaleString()}</button>`).join('')}
+      </div>
+    </div>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r8);padding:14px 16px;margin-bottom:18px">
+      <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--t3)">
+        <span>Available balance</span>
+        <span style="color:var(--g);font-weight:700;font-size:14px">₹${state.balance.toFixed(2)}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--t3);margin-top:8px">
+        <span>Processing time</span><span>Within 30 minutes</span>
+      </div>
+    </div>
+    <button class="submit-btn withdraw" onclick="submitUPIWithdraw()" id="wd-btn"
+      style="width:100%;min-height:52px;font-size:16px;">💸 WITHDRAW VIA UPI</button>
+    <div class="fee-info" style="margin-top:10px;"><span>0% withdrawal fee</span><span style="color:var(--b)">🔒 Secure payout</span></div>`;
+}
+
+function setWAmount(val) {
+  const inp = document.getElementById('withdraw-amount');
+  if (inp) inp.value = val;
+}
+
+async function submitUPIWithdraw() {
+  const upiId = document.getElementById('upi-id')?.value?.trim();
+  const amount = parseFloat(document.getElementById('withdraw-amount')?.value || 0);
+  if (!upiId || !upiId.includes('@')) return toast('err','❌','Invalid UPI ID','Format: name@bank');
+  if (!amount || amount < 200) return toast('err','❌','Invalid Amount','Minimum ₹200');
+
+  if (amount > state.balance) return toast('err','❌','Insufficient Balance',`You need ₹${amount.toFixed(2)}, have ₹${state.balance.toFixed(2)}`);
+
+  const btn = document.getElementById('wd-btn');
+  btn.disabled = true; btn.textContent = 'PROCESSING...';
+
+  try {
+    const r = await apiFetch('/payment/withdraw/upi','POST',{ amount, upiId });
+    state.balance = r.balance;
+    updateBalanceUI();
+    await loadHistory();
+    showStatus('💸','Withdrawal Initiated',`₹${amount} is on its way to ${upiId}. ETA: 30 minutes.`);
+    toast('ok','✅','Withdrawal Submitted',r.message);
+  } catch(e) {
+    toast('err','❌','Failed',e.message);
+  }
+  btn.disabled = false; btn.textContent = '💸 WITHDRAW VIA UPI';
+}
+
+// ─── CARD WITHDRAW ───────────────────────────────────────────
+function renderCardWithdrawForm(area) {
+  area.innerHTML = `
+    <div style="background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.3);border-radius:var(--r8);padding:14px;margin-bottom:16px;font-size:13px;color:var(--t2)">
+      ℹ️ Card withdrawals are processed via bank transfer. Use UPI for instant settlement.
+    </div>
+    <div class="form-group">
+      <div class="form-label">Account Number</div>
+      <div class="input-wrap"><span class="input-icon">🏦</span><input type="text" id="acct-num" placeholder="Enter bank account number"></div>
+    </div>
+    <div class="form-group">
+      <div class="form-label">IFSC Code</div>
+      <div class="input-wrap"><span class="input-icon">🔢</span><input type="text" id="ifsc" placeholder="E.g. HDFC0001234" maxlength="11"></div>
+    </div>
+    <div class="form-group">
+      <div class="form-label">Amount (INR)</div>
+      <div class="input-wrap"><span class="input-icon">₹</span><input type="number" id="withdraw-amount" placeholder="Enter amount" min="500"></div>
+    </div>
+    <button class="submit-btn withdraw" onclick="toast('info','🏦','Coming Soon','Bank transfer withdrawals will be available soon. Use UPI for instant payouts.')">🏦 BANK TRANSFER</button>`;
+}
+
+// ─── CRYPTO WITHDRAW ─────────────────────────────────────────
+function renderCryptoWithdrawForm(area, currency) {
+  const meta = CRYPTO_META[currency] || CRYPTO_META.btc;
+  const rate = state.rates[currency.toUpperCase()]?.usd || 0;
+
+  area.innerHTML = `
+    <div class="form-group">
+      <div class="form-label">${meta.name} Wallet Address</div>
+      <div class="input-wrap">
+        <span class="input-icon">${meta.icon}</span>
+        <input type="text" id="crypto-addr" placeholder="${currency.toUpperCase()} wallet address" autocomplete="off">
+      </div>
+      <div style="font-size:11px;color:var(--t3);margin-top:6px">Network: ${meta.network}</div>
+    </div>
+    <div class="form-group">
+      <div class="form-label">Amount (INR) <span class="limit">Min ₹5</span></div>
+      <div class="input-wrap">
+        <span class="input-icon">$</span>
+        <input type="number" id="withdraw-amount" placeholder="Amount in INR" min="5" step="1" oninput="updateCryptoWithdrawPreview('${currency}')">
+        <span class="input-suffix" id="crypto-wd-preview"></span>
+      </div>
+      <div class="quick-amounts">
+        ${[10,25,50,100,250].map(v=>`<button class="qa-btn" onclick="setWAmount(${v})">₹${v}</button>`).join('')}
+      </div>
+      ${rate ? `<div style="font-size:11px;color:var(--t3);margin-top:6px">Rate: 1 ${meta.name} = ₹${rate.toLocaleString()}</div>` : ''}
+    </div>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r8);padding:12px 14px;margin-bottom:16px">
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--t3)">
+        <span>Your balance</span><span style="color:var(--g);font-weight:600">₹${state.balance.toFixed(2)}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--t3);margin-top:6px">
+        <span>Network fee</span><span>Deducted from amount</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--t3);margin-top:6px">
+        <span>Processing time</span><span>10–60 minutes</span>
+      </div>
+    </div>
+    <button class="submit-btn withdraw" onclick="submitCryptoWithdraw('${currency}')" id="wd-btn">
+      ${meta.icon} WITHDRAW ${meta.name.toUpperCase()}
+    </button>
+    <div class="fee-info"><span>⚠️ Double-check address — crypto is irreversible</span></div>`;
+}
+
+function updateCryptoWithdrawPreview(currency) {
+  const amount = parseFloat(document.getElementById('withdraw-amount')?.value || 0);
+  const rate   = state.rates[currency.toUpperCase()]?.usd || 0;
+  const el     = document.getElementById('crypto-wd-preview');
+  if (el && rate && amount) el.textContent = `≈ ${(amount/rate).toFixed(6)} ${currency.toUpperCase()}`;
+}
+
+async function submitCryptoWithdraw(currency) {
+  const address = document.getElementById('crypto-addr')?.value?.trim();
+  const amount  = parseFloat(document.getElementById('withdraw-amount')?.value || 0);
+  const meta    = CRYPTO_META[currency] || {};
+  if (!address || address.length < 20) return toast('err','❌','Invalid Address','Enter a valid wallet address');
+  if (!amount || amount < 5) return toast('err','❌','Invalid Amount','Minimum ₹5');
+  if (amount > state.balance) return toast('err','❌','Insufficient Balance',`Balance: ₹${state.balance.toFixed(2)}`);
+
+  const btn = document.getElementById('wd-btn');
+  btn.disabled = true; btn.textContent = 'SUBMITTING...';
+
+  try {
+    const r = await apiFetch('/payment/withdraw/crypto','POST',{ amount, currency, address });
+    state.balance = r.balance;
+    updateBalanceUI();
+    await loadHistory();
+    showStatus('📤','Withdrawal Submitted',`₹${amount} in ${currency.toUpperCase()} is being sent to ${address.slice(0,16)}... ETA: 10–60 minutes.`);
+    toast('ok','✅','Submitted',r.message);
+  } catch(e) {
+    toast('err','❌','Failed',e.message);
+  }
+  btn.disabled = false;
+  btn.textContent = `${meta.icon} WITHDRAW ${(meta.name||currency).toUpperCase()}`;
+}
+
+// ── INSTRUCTIONS ─────────────────────────────────────────────
+const INSTRUCTIONS = {
+  deposit: {
+    upi:  ['Enter amount in INR','Select your UPI app','Scan QR or enter UPI ID in your app','Payment is auto-credited instantly'],
+    card: ['Enter amount in INR','Click Pay via Card','Enter your Visa/Mastercard details','Secure 3D verification','Credited to balance instantly'],
+    btc:  ['Enter INR amount','Click Generate Address','Copy the Bitcoin address shown','Send from your wallet','Balance credited after 1 confirmation'],
+    eth:  ['Enter INR amount','Generate ETH address','Send from MetaMask or exchange','Use ERC-20 network only','Credited after confirmation'],
+    usdt: ['Enter USDT amount','Get TRC-20 address','Send USDT on Tron network (NOT ERC-20)','Fast & low fees','Instant credit'],
+  },
+  withdraw: {
+    upi:    ['Enter your UPI ID (e.g. name@upi)','Enter withdrawal amount in INR','Confirm — funds arrive in ~30 min','Min ₹200 · 0% fee'],
+    card:   ['Enter bank account + IFSC','Submit withdrawal request','Processed in 1-3 business days','Min ₹500'],
+    btc:    ['Enter your Bitcoin address','Enter INR amount to withdraw','Submit — sent on-chain in 10-60 min','Min ₹5 · double-check address'],
+    eth:    ['Enter your ETH (ERC-20) address','Enter amount','Sent within 60 minutes','Min ₹5'],
+    usdt:   ['Enter TRC-20 USDT address','Enter amount','Fast TRC-20 transfer','Min ₹5'],
+  },
+};
+
+function renderInstructions() {
+  const m    = state.mode;
+  const meth = state.method;
+  const map  = INSTRUCTIONS[m] || {};
+  const list = map[meth] || map.btc || [];
+
+  document.getElementById('instr-title').textContent = m === 'deposit' ? '📋 How to Deposit' : '📋 How to Withdraw';
+  document.getElementById('instr-list').innerHTML = list.map((t,i) =>
+    `<li><div class="il-num">${i+1}</div><span>${t}</span></li>`
+  ).join('');
+}
+
+// ── HISTORY ──────────────────────────────────────────────────
+function renderHistory(txs) {
+  const el = document.getElementById('history-list');
+  if (!txs.length) { el.innerHTML = '<div style="color:var(--t3);font-size:12px;text-align:center;padding:16px">No transactions yet</div>'; return; }
+
+  const methodEmoji = m => ({ UPI:'🏦', card:'💳', BTC:'₿', ETH:'Ξ', USDT:'₮', LTC:'Ł', DOGE:'Ð', BNB:'⬡', razorpay:'💳', 'card/upi':'💳' })[m] || '💰';
+
+  el.innerHTML = txs.slice(0,8).map(tx => {
+    const isPos = tx.type === 'deposit';
+    const amt   = Math.abs(tx.amount);
+    const date  = new Date(tx.createdAt).toLocaleDateString('en-IN', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
+    return `<div class="hist-item">
+      <div class="hist-icon ${tx.type}">${methodEmoji(tx.method)}</div>
+      <div class="hist-body">
+        <div class="hist-method">${tx.method || tx.type}</div>
+        <div class="hist-date">${date}</div>
+      </div>
+      <div style="text-align:right">
+        <div class="hist-amt ${isPos?'pos':'neg'}">${isPos?'+':'-'}₹${amt.toFixed(2)}</div>
+        <div class="hist-status ${tx.status||'pending'}">${tx.status||'pending'}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── UTILS ─────────────────────────────────────────────────────
+async function apiFetch(endpoint, method='GET', body=null) {
+  const opts = {
+    method,
+    headers: { 'Content-Type':'application/json', Authorization:`Bearer ${token}` },
+  };
+  if (body) opts.body = JSON.stringify(body);
+  const r    = await fetch(API + endpoint, opts);
+  const data = await r.json();
+  if (!r.ok) throw new Error(data.error || 'Request failed');
+  return data;
+}
+
+function copyAddress(addr) {
+  navigator.clipboard.writeText(addr).then(() => {
+    const btn = document.getElementById('copy-btn');
+    if (btn) { btn.textContent = '✅ Copied!'; btn.classList.add('copied'); setTimeout(() => { btn.textContent='📋 Copy Address'; btn.classList.remove('copied'); }, 2000); }
+  });
+}
+
+function clearPollInterval() {
+  if (state.pollInterval) { clearInterval(state.pollInterval); state.pollInterval = null; }
+}
+
+function toast(type, icon, title, sub) {
+  const el = document.getElementById('toast');
+  document.getElementById('t-icon').textContent  = icon;
+  document.getElementById('t-title').textContent = title;
+  document.getElementById('t-sub').textContent   = sub || '';
+  el.className = `toast show ${type}`;
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove('show'), 4000);
+}
+
+function showStatus(icon, title, sub) {
+  document.getElementById('sb-icon').textContent  = icon;
+  document.getElementById('sb-title').textContent = title;
+  document.getElementById('sb-sub').textContent   = sub;
+  document.getElementById('status-overlay').classList.add('show');
+}
+
+function closeStatus() {
+  document.getElementById('status-overlay').classList.remove('show');
+}
+
+// Demo mode — credit without real payment
+function simulateDeposit(usdAmount, method) {
+  const min = 0.1;
+  if (usdAmount < min) return toast('err','❌','Too small',`Minimum ₹${min}`);
+  state.balance += usdAmount;
+  updateBalanceUI();
+  showStatus('🎉','Demo Deposit',`+₹${usdAmount.toFixed(2)} added (demo mode — add RAZORPAY_KEY_ID for real payments)`);
+  toast('ok','✅','Demo deposit',`+₹${usdAmount.toFixed(2)} added to balance`);
+}
+
+// ── MANUAL PAYMENT OVERRIDE ──────────────────────────────────
+state.methods = [];
+state.minDeposit = 300;
+
+async function loadRates() {
+  state.rates = {};
+}
+
+async function loadConfig() {
+  try {
+    const [config, methods] = await Promise.all([apiFetch('/payment/config'), apiFetch('/payment/methods')]);
+    state.config = config;
+    state.methods = methods.methods || [];
+    state.minDeposit = config.minDeposit || methods.minDeposit || 300;
+  } catch(e) {
+    state.config = { minDeposit: 300 };
+    state.methods = [];
+  }
+}
+
+async function loadHistory() {
+  try {
+    const data = await apiFetch('/payment/history');
+    state.balance = Number(data.balance || state.balance || 0);
+    updateBalanceUI();
+    const deposits = data.deposits || [];
+    renderHistory(deposits.length ? deposits : (data.transactions || []));
+    renderPaymentHistory(deposits);
+    document.getElementById('rp-deposited').textContent = `₹${Number(data.approvedDepositTotal || 0).toLocaleString('en-IN')}`;
+    document.getElementById('rp-withdrawn').textContent = '₹0';
+  } catch(e) {
+    renderHistory([]);
+    renderPaymentHistory([]);
+  }
+}
+
+// ── Full payment-history table ───────────────────────────────
+function statusBadge(status) {
+  const s = (status || 'pending').toLowerCase();
+  const map = {
+    approved:  { icon:'✅', label:'Cleared'  },
+    completed: { icon:'✅', label:'Cleared'  },
+    pending:   { icon:'⏳', label:'Pending'  },
+    rejected:  { icon:'❌', label:'Rejected' },
+    failed:    { icon:'❌', label:'Rejected' },
+  };
+  const cfg = map[s] || map.pending;
+  return `<span class="ph-badge ${s}">${cfg.icon} ${cfg.label}</span>`;
+}
+
+function renderPaymentHistory(deposits) {
+  const tbody = document.getElementById('ph-tbody');
+  if (!tbody) return;
+  if (!deposits.length) {
+    tbody.innerHTML = `<tr><td colspan="6" class="ph-empty">No deposits yet. Your payment history will appear here.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = deposits.map(d => {
+    const amount = Number(d.amount || 0);
+    const method = d.method === 'crypto' ? (d.coin || 'CRYPTO') : 'UPI';
+    const icon = d.method === 'crypto' ? '₿' : '🏦';
+    const date = new Date(d.createdAt).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'2-digit', hour:'2-digit', minute:'2-digit' });
+    const ref = d.reference || '—';
+    const utr = d.userPaymentReference || '—';
+    return `<tr>
+      <td>${date}</td>
+      <td><span class="ph-method-pill">${icon} ${method}</span></td>
+      <td class="ph-amt">₹${amount.toLocaleString('en-IN')}</td>
+      <td class="ph-hide-sm"><span class="ph-ref">${ref}</span></td>
+      <td class="ph-hide-sm"><span class="ph-ref">${utr}</span></td>
+      <td>${statusBadge(d.status)}</td>
+    </tr>`;
+  }).join('');
+}
+
+function setMethod(method) {
+  state.method = method;
+  state.depositStep = 1;
+  document.querySelectorAll('.method-btn').forEach(btn => btn.classList.remove('active'));
+  const active = document.getElementById(`method-${method}`);
+  if (active) active.classList.add('active');
+  renderForm();
+  renderInstructions();
+}
+
+function setMode(mode) {
+  state.mode = mode;
+  state.depositStep = 1;
+  document.querySelectorAll('.mode-tab').forEach(tab => tab.classList.remove('active'));
+  document.getElementById(`tab-${mode}`).classList.add('active');
+  renderForm();
+  renderInstructions();
+}
+
+function selectedAccount() {
+  const method = state.method === 'upi' ? 'upi' : 'crypto';
+  const group = state.methods.find(m => m.method === method);
+  const accounts = group?.accounts || [];
+  if (method === 'upi') return accounts[0] || null;
+  const coin = state.method.toUpperCase();
+  return accounts.find(a => a.crypto?.coin === coin) || accounts[0] || null;
+}
+
+// ── Stepped deposit flow state ───────────────────────────────
+// step 1 = enter amount (UPI/wallet highlighted)
+// step 2 = enter UTR / tx reference
+// step 3 = waiting for verification
+state.depositStep = 1;
+state.depositAmount = 0;
+
+function stepIndicator() {
+  const steps = [
+    { n: 1, label: 'Amount' },
+    { n: 2, label: 'Reference' },
+    { n: 3, label: 'Verify' },
+  ];
+  return `<div class="dep-steps">${steps.map(s => {
+    const cls = state.depositStep > s.n ? 'done' : state.depositStep === s.n ? 'active' : '';
+    const inner = state.depositStep > s.n ? '✓' : s.n;
+    return `<div class="ds ${cls}"><div class="ds-dot">${inner}</div><span>${s.label}</span></div>`;
+  }).join('')}</div>`;
+}
+
+function renderDepositForm() {
+  const area = document.getElementById('form-area');
+  const account = selectedAccount();
+  const isUpi = state.method === 'upi';
+  const target = isUpi ? account?.upiId : account?.crypto?.walletAddress;
+  const coin = isUpi ? 'UPI' : (account?.crypto?.coin || state.method.toUpperCase());
+
+  if (!account || !target) {
+    area.innerHTML = `<div style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.3);border-radius:var(--r8);padding:14px;color:var(--t2);font-size:13px">No enabled ${isUpi ? 'UPI ID' : `${coin} wallet`} is configured yet. Please contact support.</div>`;
+    return;
+  }
+
+  if (state.depositStep === 2) return renderStepReference(area, account, isUpi, coin, target);
+  if (state.depositStep === 3) return renderStepWaiting(area);
+  return renderStepAmount(area, account, isUpi, coin, target);
+}
+
+// ── STEP 1 — Highlighted UPI/wallet + amount only ────────────
+function renderStepAmount(area, account, isUpi, coin, target) {
+  const networkLine = account?.crypto?.network
+    ? `<div class="uh-meta">Network: ${account.crypto.network}</div>` : '';
+
+  area.innerHTML = `
+    ${stepIndicator()}
+
+    <div class="upi-highlight">
+      <div class="uh-label">${isUpi ? '🏦 Pay to this UPI ID' : `${coin} Wallet Address`}</div>
+      <div class="uh-id" id="pay-target">${target}</div>
+      <div class="uh-meta">${account.label}</div>
+      ${networkLine}
+      <button class="copy-btn" id="copy-btn" onclick="copyAddress('${target}')">📋 Copy ${isUpi ? 'UPI ID' : 'Address'}</button>
+    </div>
+
+    <div class="form-group">
+      <div class="form-label">Enter Deposit Amount <span class="limit">Min ₹${state.minDeposit}</span></div>
+      <div class="input-wrap">
+        <span class="input-icon">₹</span>
+        <input type="number" id="deposit-amount" placeholder="Enter the amount you are paying" min="${state.minDeposit}" value="${state.depositAmount || ''}">
+        <span class="input-suffix">INR</span>
+      </div>
+      <div class="quick-amounts">
+        ${[300,500,1000,2000,5000].map(v=>`<button class="qa-btn" onclick="setAmount(${v})">₹${v.toLocaleString('en-IN')}</button>`).join('')}
+      </div>
+    </div>
+
+    <button class="submit-btn deposit" onclick="goToReferenceStep()" id="dep-btn">Continue →</button>
+    <div class="fee-info"><span>Pay externally to the highlighted ${isUpi ? 'UPI ID' : 'wallet'}</span><span class="free">Step 1 of 3</span></div>`;
+}
+
+// ── STEP 2 — Enter UTR / transaction reference ───────────────
+function renderStepReference(area, account, isUpi, coin, target) {
+  area.innerHTML = `
+    ${stepIndicator()}
+
+    <button class="step-back" onclick="goToAmountStep()">← Back to amount</button>
+
+    <div class="amt-confirm">
+      <span>Paying to <b style="font-size:13px;color:var(--g)">${target}</b></span>
+      <b>₹${Number(state.depositAmount).toLocaleString('en-IN')}</b>
+    </div>
+
+    <div class="form-group">
+      <div class="form-label">${isUpi ? 'Enter UTR Number' : 'Enter Transaction Hash'} <span class="limit">Required</span></div>
+      <div class="input-wrap">
+        <span class="input-icon">#</span>
+        <input type="text" id="payment-reference" placeholder="${isUpi ? 'e.g. 12-digit UPI UTR number' : 'Paste the on-chain transaction hash'}" autocomplete="off">
+      </div>
+      <div style="font-size:11px;color:var(--t3);margin-top:8px">
+        ${isUpi
+          ? 'After paying, copy the UTR / reference number from your UPI app and paste it here so we can verify your payment.'
+          : 'After sending, paste the transaction hash from your wallet so we can verify it on-chain.'}
+      </div>
+    </div>
+
+    <button class="submit-btn deposit" onclick="completeManualPayment()" id="dep-btn">Submit for Verification</button>
+    <div class="fee-info"><span>Manual verification</span><span class="free">Step 2 of 3</span></div>`;
+}
+
+// ── STEP 3 — Waiting for verification ────────────────────────
+function renderStepWaiting(area) {
+  area.innerHTML = `
+    ${stepIndicator()}
+
+    <div style="text-align:center;padding:24px 12px">
+      <div style="font-size:48px;margin-bottom:14px">⏳</div>
+      <div style="font-family:var(--fh);font-size:22px;font-weight:700;color:var(--t1);margin-bottom:8px">
+        Waiting for Verification
+      </div>
+      <div style="font-size:14px;color:var(--t2);line-height:1.6;max-width:340px;margin:0 auto">
+        Your deposit of <b style="color:var(--g)">₹${Number(state.depositAmount).toLocaleString('en-IN')}</b>
+        has been submitted.<br>
+        Please wait 5–10 minutes while your payment is being verified by our team.
+      </div>
+      <div style="margin-top:18px;font-size:12px;color:var(--t3)">
+        You can track the status anytime in <b>Payment History</b> below.
+      </div>
+    </div>
+
+    <button class="submit-btn deposit" onclick="startNewDeposit()" id="dep-btn">Make Another Deposit</button>
+    <div class="fee-info"><span>Status updates automatically</span><span class="free">Step 3 of 3</span></div>`;
+}
+
+// ── Step navigation ──────────────────────────────────────────
+function setAmount(val) {
+  const input = document.getElementById('deposit-amount');
+  if (input) input.value = val;
+}
+
+function goToReferenceStep() {
+  const amount = Number(document.getElementById('deposit-amount')?.value || 0);
+  if (!amount || amount < state.minDeposit) {
+    return toast('err','❌','Minimum Deposit',`Minimum deposit is ₹${state.minDeposit}`);
+  }
+  const account = selectedAccount();
+  if (!account) return toast('err','❌','Unavailable','No payment address is enabled for this method');
+  state.depositAmount = amount;
+  state.depositStep = 2;
+  renderForm();
+}
+
+function goToAmountStep() {
+  state.depositStep = 1;
+  renderForm();
+}
+
+function startNewDeposit() {
+  state.depositStep = 1;
+  state.depositAmount = 0;
+  renderForm();
+}
+
+async function completeManualPayment() {
+  const reference = document.getElementById('payment-reference')?.value?.trim() || '';
+  if (!reference) {
+    return toast('err','❌','Reference Required', state.method === 'upi'
+      ? 'Please enter the UTR number from your UPI app'
+      : 'Please enter the transaction hash');
+  }
+  const account = selectedAccount();
+  if (!account) return toast('err','❌','Unavailable','No payment address is enabled for this method');
+
+  const btn = document.getElementById('dep-btn');
+  btn.disabled = true;
+  btn.textContent = 'Submitting...';
+  try {
+    const method = state.method === 'upi' ? 'upi' : 'crypto';
+    const body = {
+      method,
+      amount: state.depositAmount,
+      accountId: account.id,
+      coin: method === 'crypto' ? (account.crypto?.coin || state.method.toUpperCase()) : undefined,
+      userPaymentReference: reference,
+    };
+    const result = await apiFetch('/payment/deposits', 'POST', body);
+    await loadHistory();
+    state.depositStep = 3;
+    renderForm();
+    toast('ok','✅','Payment Submitted','Please wait 5–10 minutes while your payment is being verified.');
+  } catch(e) {
+    toast('err','❌','Deposit Failed',e.message);
+    btn.disabled = false;
+    btn.textContent = 'Submit for Verification';
+  }
+}
+
+function renderInstructions() {
+  document.getElementById('instr-title').textContent = 'How to Deposit';
+  const list = ['Select UPI or crypto', 'Send money externally to the shown ID or wallet', 'Click Continue after entering the amount', 'Enter your UTR / transaction reference number', 'Admin verifies and credits approved deposits'];
+  document.getElementById('instr-list').innerHTML = list.map((text, i) => `<li><div class="il-num">${i+1}</div><span>${text}</span></li>`).join('');
+}
+
+function renderHistory(items) {
+  const el = document.getElementById('history-list');
+  if (!items.length) {
+    el.innerHTML = '<div style="color:var(--t3);font-size:12px;text-align:center;padding:16px">No deposits yet</div>';
+    return;
+  }
+  el.innerHTML = items.slice(0,8).map(item => {
+    const amount = Number(item.amount || 0);
+    const status = item.status || 'pending';
+    const method = item.method === 'crypto' ? (item.coin || 'CRYPTO') : 'UPI';
+    const date = new Date(item.createdAt).toLocaleDateString('en-IN', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
+    return `<div class="hist-item">
+      <div class="hist-icon deposit">${method === 'UPI' ? '🏦' : '₿'}</div>
+      <div class="hist-body"><div class="hist-method">${method}</div><div class="hist-date">${date}</div></div>
+      <div style="text-align:right"><div class="hist-amt pos">₹${amount.toLocaleString('en-IN')}</div><div class="hist-status ${status}">${status}</div></div>
+    </div>`;
+  }).join('');
+}
+
+function updateBalanceUI() {
+  const value = `₹${Number(state.balance || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  document.getElementById('bal-display').textContent = value;
+  document.getElementById('rp-balance').textContent = value;
+}
+
+// ── BOOT ─────────────────────────────────────────────────────
+init();
+</script>
+</body>
+</html>
