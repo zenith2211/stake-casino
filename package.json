@@ -1,0 +1,13 @@
+{
+  "name": "stake-casino",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Stake-inspired full-stack casino — root launcher for the backend (which also serves the static frontend).",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "install-backend": "npm install --prefix backend",
+    "start": "node backend/src/server.js"
+  }
+}
